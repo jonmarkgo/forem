@@ -7,6 +7,7 @@ module Constants
       Account
       Organization
       Extensions
+      RSS Feeds
     ].freeze
   end
 end

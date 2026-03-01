@@ -1,0 +1,52 @@
+<p>
+  <strong>URL:</strong>
+  <%= @rss_feed.url %>
+</p>
+
+<p>
+  <strong>Status:</strong>
+  <%= @rss_feed.status %>
+</p>
+
+<p>
+  <strong>Last Fetched:</strong>
+  <%= @rss_feed.last_fetched_at %>
+</p>
+
+<p>
+  <strong>Organization:</strong>
+  <%= @rss_feed.organization&.name %>
+</p>
+
+<p>
+  <strong>Fallback Author:</strong>
+  <%= @rss_feed.author&.username %>
+</p>
+
+<h2>Imported Items</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Item URL</th>
+      <th>Status</th>
+      <th>Article</th>
+      <th>Error</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @rss_feed.rss_feed_items.order(created_at: :desc).each do |item| %>
+      <tr>
+        <td><%= item.item_url %></td>
+        <td><%= item.status %></td>
+        <td><%= link_to item.article.title, item.article if item.article %></td>
+        <td><%= item.error_message %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+
+<%= link_to "Edit", edit_rss_feed_path(@rss_feed) %> |
+<%= link_to "Back", rss_feeds_path %>
