@@ -38,6 +38,7 @@ class Organization < ApplicationRecord
   has_many :users, through: :organization_memberships
   has_many :active_memberships, -> { where.not(type_of_user: "pending") }, class_name: "OrganizationMembership"
   has_many :active_users, through: :active_memberships, source: :user
+  has_many :feed_sources, foreign_key: :fallback_organization_id, inverse_of: :fallback_organization, dependent: :nullify
 
   validates :articles_count, presence: true
   validates :bg_color_hex, format: COLOR_HEX_REGEXP, allow_blank: true

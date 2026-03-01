@@ -22,6 +22,7 @@ pt:
         following_orgs: Organizações seguidas
         following_pods: Podcasts seguidos
         hidden_tags: Tags ocultas
+        rss_import: Importacao RSS
         listings: Anúncios
         analytics: Analytics
         for_org: Analytics para %{org}
@@ -101,3 +102,37 @@ pt:
         icon: Detalhes
         author_is: 'AUTOR: '
         save: Salvar
+      rss_import:
+        heading: Importacao RSS
+        manage_heading: Add a feed source
+        manage_desc: Manage feed sources and defaults used when imported items cannot be mapped automatically.
+        feed_url: RSS Feed URL
+        fallback_author: Fallback author
+        fallback_organization: Fallback organization
+        none: None
+        add_feed: Add feed source
+        sources_heading: Feed sources
+        no_sources: No feed sources configured.
+        enabled: Enabled
+        mark_canonical: Mark source URL as canonical by default
+        referential: Replace self-referential links
+        save: Save
+        fetch_now: Fetch now
+        delete: Delete
+        delete_confirm: Delete this feed source?
+        last_fetch: Last fetch
+        never: Never
+        runs_heading: Recent imports
+        no_runs: No import runs yet.
+        imported_count:
+          one: "%{count} imported"
+          other: "%{count} imported"
+        detected_count:
+          one: "%{count} detected item"
+          other: "%{count} detected items"
+        skipped_count:
+          one: "%{count} skipped item"
+          other: "%{count} skipped items"
+        failed_count:
+          one: "%{count} failed item"
+          other: "%{count} failed items"

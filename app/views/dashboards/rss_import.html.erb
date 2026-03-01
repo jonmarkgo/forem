@@ -1,0 +1,120 @@
+<% title t("views.dashboard.rss_import.heading") %>
+<main id="main-content" class="crayons-layout crayons-layout--header-inside crayons-layout--2-cols mb-10">
+  <%= render("header_and_action", page_title: t("views.dashboard.rss_import.heading")) %>
+
+  <div class="crayons-layout__content">
+    <section class="crayons-card crayons-card--content-rows p-6 mb-4">
+      <h2 class="crayons-subtitle-1"><%= t("views.dashboard.rss_import.manage_heading") %></h2>
+      <p><%= t("views.dashboard.rss_import.manage_desc") %></p>
+
+      <%= form_with url: dashboard_feed_sources_path, scope: :feed_source, local: true, class: "grid gap-4" do |f| %>
+        <div class="crayons-field">
+          <%= f.label :url, t("views.dashboard.rss_import.feed_url"), class: "crayons-field__label" %>
+          <%= f.url_field :url, placeholder: "https://yoursite.com/feed", class: "crayons-textfield", required: true %>
+        </div>
+
+        <div class="crayons-field crayons-field--checkbox">
+          <%= f.check_box :feed_mark_canonical, class: "crayons-checkbox" %>
+          <%= f.label :feed_mark_canonical, t("views.settings.extensions.rss.mark_canonical_html"), class: "crayons-field__label" %>
+        </div>
+
+        <div class="crayons-field crayons-field--checkbox">
+          <%= f.check_box :feed_referential_link, checked: true, class: "crayons-checkbox" %>
+          <%= f.label :feed_referential_link, t("views.settings.extensions.rss.referential_html", community: community_name), class: "crayons-field__label" %>
+        </div>
+
+        <div class="crayons-field">
+          <%= f.label :fallback_author_id, t("views.dashboard.rss_import.fallback_author"), class: "crayons-field__label" %>
+          <%= f.select :fallback_author_id,
+                       options_for_select([[current_user.username, current_user.id]], current_user.id),
+                       {},
+                       class: "crayons-select" %>
+        </div>
+
+        <div class="crayons-field">
+          <%= f.label :fallback_organization_id, t("views.dashboard.rss_import.fallback_organization"), class: "crayons-field__label" %>
+          <%= f.select :fallback_organization_id,
+                       options_for_select(@organizations.map { |org| ["@#{org.slug}", org.id] }),
+                       { include_blank: t("views.dashboard.rss_import.none") },
+                       class: "crayons-select" %>
+        </div>
+
+        <button type="submit" class="crayons-btn w-max"><%= t("views.dashboard.rss_import.add_feed") %></button>
+      <% end %>
+    </section>
+
+    <section class="crayons-card crayons-card--content-rows p-6 mb-4">
+      <h2 class="crayons-subtitle-1"><%= t("views.dashboard.rss_import.sources_heading") %></h2>
+      <% if @feed_sources.blank? %>
+        <p><%= t("views.dashboard.rss_import.no_sources") %></p>
+      <% else %>
+        <div class="grid gap-4">
+          <% @feed_sources.each do |feed_source| %>
+            <article class="crayons-card crayons-card--secondary p-4">
+              <%= form_with model: feed_source, url: dashboard_feed_source_path(feed_source), method: :patch, local: true, class: "grid gap-3" do |f| %>
+                <div class="crayons-field">
+                  <%= f.label :url, t("views.dashboard.rss_import.feed_url"), class: "crayons-field__label" %>
+                  <%= f.url_field :url, class: "crayons-textfield", required: true %>
+                </div>
+
+                <div class="grid gap-2">
+                  <label class="crayons-field crayons-field--checkbox">
+                    <%= f.check_box :enabled, class: "crayons-checkbox" %>
+                    <span class="crayons-field__label"><%= t("views.dashboard.rss_import.enabled") %></span>
+                  </label>
+                  <label class="crayons-field crayons-field--checkbox">
+                    <%= f.check_box :feed_mark_canonical, class: "crayons-checkbox" %>
+                    <span class="crayons-field__label"><%= t("views.dashboard.rss_import.mark_canonical") %></span>
+                  </label>
+                  <label class="crayons-field crayons-field--checkbox">
+                    <%= f.check_box :feed_referential_link, class: "crayons-checkbox" %>
+                    <span class="crayons-field__label"><%= t("views.dashboard.rss_import.referential") %></span>
+                  </label>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <button type="submit" class="crayons-btn crayons-btn--secondary"><%= t("views.dashboard.rss_import.save") %></button>
+                  <%= button_to t("views.dashboard.rss_import.fetch_now"), fetch_dashboard_feed_source_path(feed_source), method: :post, class: "crayons-btn crayons-btn--secondary", form_class: "inline-block" %>
+                  <%= button_to t("views.dashboard.rss_import.delete"), dashboard_feed_source_path(feed_source), method: :delete, class: "crayons-btn crayons-btn--danger", form_class: "inline-block", data: { confirm: t("views.dashboard.rss_import.delete_confirm") } %>
+                </div>
+
+                <p class="fs-s color-base-60">
+                  <%= t("views.dashboard.rss_import.last_fetch") %>:
+                  <%= feed_source.last_fetched_at ? l(feed_source.last_fetched_at, format: :short) : t("views.dashboard.rss_import.never") %>
+                </p>
+              <% end %>
+            </article>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="crayons-card crayons-card--content-rows p-6">
+      <h2 class="crayons-subtitle-1"><%= t("views.dashboard.rss_import.runs_heading") %></h2>
+      <% if @recent_runs.blank? %>
+        <p><%= t("views.dashboard.rss_import.no_runs") %></p>
+      <% else %>
+        <div class="grid gap-3">
+          <% @recent_runs.each do |run| %>
+            <details class="crayons-card crayons-card--secondary p-4">
+              <summary>
+                <strong><%= run.feed_source.url %></strong>
+                -
+                <%= run.status %>
+                (<%= t("views.dashboard.rss_import.imported_count", count: run.imported_items_count) %>)
+              </summary>
+              <div class="pt-3 fs-s">
+                <p><%= t("views.dashboard.rss_import.detected_count", count: run.detected_items_count) %></p>
+                <p><%= t("views.dashboard.rss_import.skipped_count", count: run.skipped_items_count) %></p>
+                <p><%= t("views.dashboard.rss_import.failed_count", count: run.failed_items_count) %></p>
+                <% if run.error_message.present? %>
+                  <p><%= run.error_message %></p>
+                <% end %>
+              </div>
+            </details>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</main>

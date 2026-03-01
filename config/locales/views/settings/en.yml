@@ -158,6 +158,9 @@ en:
           last_html: 'Last Fetched: %{time}'
           mark_canonical_html: Mark the RSS source as canonical URL by default <p class='crayons-field__description'>If you check this box, the post will automatically mark the feed source as the canonical URL.</p>
           referential_html: Replace self-referential links with %{community}-specific links <p class='crayons-field__description'>If you check this box, the post will automatically change any URLs included in the post to refer to the version of that article on %{community} if available. This is primarily meant for folks migrating their entire blog onto %{community}.</p>
+          manage_in_dashboard_html: RSS feed setup and import monitoring now live in the %{dashboard}.
+          import_dashboard: RSS import dashboard
+          open_dashboard: Open RSS import dashboard
           save: Save Feed Settings
           submit: Submit Feed Settings
       finalize_html: You have requested a change to %{email}. Check your inbox for the verification link to finalize the change.

@@ -260,4 +260,49 @@ RSpec.describe Feeds::Import, :vcr, type: :service do
         .and change(rss_feed_user2.articles, :count).by(10)
     end
   end
+
+  context "when importing through feed_sources tracking" do
+    let(:user) { create(:user, last_article_at: 1.month.ago, last_presence_at: 1.month.ago) }
+    let(:feed_source) { create(:feed_source, user: user, fallback_author: user, url: "https://example.com/rss.xml") }
+    let(:item) do
+      instance_double(
+        Feedjira::Parser::RSSEntry,
+        title: "A sample title",
+        url: "https://example.com/post-1",
+        categories: ["ruby"],
+        content: "<p>Hello world</p>",
+        summary: nil,
+        description: nil,
+        published: Time.current,
+        entry_id: "post-1",
+        :[] => nil,
+      )
+    end
+    let(:feed) { instance_double(Feedjira::Parser::RSS, entries: [item]) }
+
+    before do
+      allow(HTTParty).to receive(:get).and_return(double(body: "<xml />"))
+      allow(Feedjira).to receive(:parse).and_return(feed)
+      allow(Feeds::CheckItemMediumReply).to receive(:call).and_return(false)
+      allow(Feeds::CheckItemPreviouslyImported).to receive(:call).and_return(false)
+      allow(Feeds::AssembleArticleMarkdown).to receive(:call).and_return("---\ntitle: A sample title\n---\nBody")
+    end
+
+    it "creates a feed import run and item records" do
+      expect do
+        described_class.call(users_scope: User.where(id: user.id), feed_source_ids: [feed_source.id])
+      end.to change(FeedImportRun, :count).by(1)
+        .and change(FeedImportItem, :count).by(1)
+        .and change(Article, :count).by(1)
+
+      run = FeedImportRun.last
+      item = FeedImportItem.last
+
+      expect(run.feed_source_id).to eq(feed_source.id)
+      expect(run.imported_items_count).to eq(1)
+      expect(run.succeeded?).to be(true)
+      expect(item.imported?).to be(true)
+      expect(item.feed_source_id).to eq(feed_source.id)
+    end
+  end
 end

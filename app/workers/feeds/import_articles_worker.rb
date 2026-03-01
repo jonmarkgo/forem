@@ -10,8 +10,13 @@ module Feeds
     # NOTE: [@rhymes] we need to default earlier_than to `nil` because sidekiq-cron,
     # by using YAML to define jobs arguments does not support datetimes evaluated
     # at runtime
-    def perform(user_ids = [], earlier_than = nil)
+    def perform(user_ids = [], earlier_than = nil, feed_source_ids = [])
       users_scope = User
+
+      if feed_source_ids.present?
+        user_ids = FeedSource.enabled.where(id: feed_source_ids).pluck(:user_id)
+        return if user_ids.blank?
+      end
 
       if user_ids.present?
         users_scope = users_scope.where(id: user_ids)
@@ -37,7 +42,7 @@ module Feeds
       end
 
       users_scope.select(:id).find_in_batches do |batch|
-        arg_lists = batch.map { |user| [user.id, earlier_than] }
+        arg_lists = batch.map { |user| [user.id, earlier_than, feed_source_ids] }
 
         ForUser.perform_bulk(arg_lists)
       end
@@ -49,10 +54,10 @@ module Feeds
 
       sidekiq_throttle(concurrency: { limit: 5 })
 
-      def perform(user_ids, earlier_than)
+      def perform(user_ids, earlier_than, feed_source_ids = [])
         users_scope = User.where(id: user_ids)
 
-        ::Feeds::Import.call(users_scope: users_scope, earlier_than: earlier_than)
+        ::Feeds::Import.call(users_scope: users_scope, earlier_than: earlier_than, feed_source_ids: feed_source_ids)
       end
     end
   end
