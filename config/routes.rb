@@ -378,6 +378,11 @@ Rails.application.routes.draw do
     get "/dashboard", to: "dashboards#show"
     get "/dashboard/sidebar", to: "dashboards#sidebar"
     get "/dashboard/analytics", to: "dashboards#analytics"
+    get "/dashboard/rss-import", to: "dashboards#rss_import", as: :dashboard_rss_import
+    post "/dashboard/rss-import/feeds", to: "feed_sources#create", as: :dashboard_feed_sources
+    patch "/dashboard/rss-import/feeds/:id", to: "feed_sources#update", as: :dashboard_feed_source
+    delete "/dashboard/rss-import/feeds/:id", to: "feed_sources#destroy"
+    post "/dashboard/rss-import/feeds/:id/fetch", to: "feed_sources#fetch", as: :fetch_dashboard_feed_source
     get "dashboard/analytics/org/:org_id", to: "dashboards#analytics", as: :dashboard_analytics_org
     get "dashboard/following", to: "dashboards#following_tags"
     get "dashboard/following_tags", to: "dashboards#following_tags"

@@ -115,6 +115,17 @@ class DashboardsController < ApplicationController
     @collections_count = collections_count(@user)
   end
 
+  def rss_import
+    fetch_and_authorize_user
+    @feed_sources = @user.feed_sources.includes(:fallback_author, :fallback_organization).order(created_at: :desc)
+    @organizations = @user.admin_organizations
+    @recent_runs = FeedImportRun
+      .where(feed_source_id: @feed_sources.select(:id))
+      .includes(:feed_source)
+      .order(created_at: :desc)
+      .limit(30)
+  end
+
   private
 
   def follows_for(user:, type:, order_by: :created_at)

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "User edits their extensions", js: true do
+RSpec.describe "User edits their extensions" do
   let(:user) { create(:user) }
   let(:github_response_body) do
     [
@@ -21,17 +21,17 @@ RSpec.describe "User edits their extensions", js: true do
 
   describe "Feed" do
     before do
-      visit user_settings_path(:extensions)
+      visit dashboard_rss_import_path
     end
 
     it "fails if the feed URL is invalid" do
       stub_request(:get, "https://medium.com/feed/alkdmksadksa")
         .to_return(status: 200, body: "not an xml feed")
 
-      fill_in "users_setting[feed_url]", with: "https://medium.com/feed/alkdmksadksa"
-      click_on "Submit Feed Settings"
+      fill_in "feed_source[url]", with: "https://medium.com/feed/alkdmksadksa"
+      click_on "Add feed source"
 
-      expect(page).to have_text("Feed url is not a valid RSS/Atom feed")
+      expect(page).to have_text("No feed sources configured.")
     end
   end
 end

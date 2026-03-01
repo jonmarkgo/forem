@@ -170,3 +170,8 @@ pt:
             confirm: Tem certeza de que deseja gerar um novo segredo? Todos os segredos pendentes serão inválidos.
             text: Você deve rotacionar isso regularmente!
             submit: Gerar novo segredo
+      extensions:
+        rss:
+          manage_in_dashboard_html: RSS feed setup and import monitoring now live in the %{dashboard}.
+          import_dashboard: RSS import dashboard
+          open_dashboard: Open RSS import dashboard

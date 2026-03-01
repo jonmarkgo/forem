@@ -82,6 +82,14 @@
       </a>
     </li>
 
+    <li>
+      <a class="crayons-link crayons-link--block <%= "crayons-link--current" if @action == "rss_import" %>"
+        href="<%= dashboard_rss_import_path %>"
+        <%= @action == "rss_import" ? ' aria-current="page"'.html_safe : "" %>>
+        <%= t("views.dashboard.actions.rss_import") %>
+      </a>
+    </li>
+
   <% if @organizations && (params[:which].blank? || params[:which] == "organization") %>
     <% @organizations.each do |org| %>
       <li>

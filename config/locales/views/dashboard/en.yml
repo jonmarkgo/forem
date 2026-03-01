@@ -22,6 +22,7 @@ en:
         following_orgs: Following organizations
         following_pods: Following podcasts
         hidden_tags: Hidden tags
+        rss_import: RSS Import
         listings: Listings
         analytics: Analytics
         for_org: Analytics for %{org}
@@ -162,3 +163,37 @@ en:
         listings: Listings created
         credits: Credits available
         lt_500: "< 500"
+      rss_import:
+        heading: RSS Import
+        manage_heading: Add a feed source
+        manage_desc: Manage feed sources and defaults used when imported items cannot be mapped automatically.
+        feed_url: RSS Feed URL
+        fallback_author: Fallback author
+        fallback_organization: Fallback organization
+        none: None
+        add_feed: Add feed source
+        sources_heading: Feed sources
+        no_sources: No feed sources configured.
+        enabled: Enabled
+        mark_canonical: Mark source URL as canonical by default
+        referential: Replace self-referential links
+        save: Save
+        fetch_now: Fetch now
+        delete: Delete
+        delete_confirm: Delete this feed source?
+        last_fetch: Last fetch
+        never: Never
+        runs_heading: Recent imports
+        no_runs: No import runs yet.
+        imported_count:
+          one: "%{count} imported"
+          other: "%{count} imported"
+        detected_count:
+          one: "%{count} detected item"
+          other: "%{count} detected items"
+        skipped_count:
+          one: "%{count} skipped item"
+          other: "%{count} skipped items"
+        failed_count:
+          one: "%{count} failed item"
+          other: "%{count} failed items"
