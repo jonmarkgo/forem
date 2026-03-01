@@ -7,7 +7,5 @@ FactoryBot.define do
     feed_referential_link { true }
     fallback_author { user }
     fallback_organization { nil }
-
-    to_create { |instance| instance.save!(validate: false) }
   end
 end

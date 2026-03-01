@@ -87,7 +87,7 @@ module Feeds
             mark_canonical: user.setting.feed_mark_canonical,
             referential_link: user.setting.feed_referential_link,
             fallback_author: user,
-            fallback_organization_id: nil,
+            fallback_organization_id: nil
           }
         end
 
@@ -102,7 +102,7 @@ module Feeds
             mark_canonical: feed_source.feed_mark_canonical,
             referential_link: feed_source.feed_referential_link,
             fallback_author: feed_source.effective_fallback_author,
-            fallback_organization_id: feed_source.fallback_organization_id,
+            fallback_organization_id: feed_source.fallback_organization_id
           }
         end
       end
@@ -128,7 +128,7 @@ module Feeds
     def create_import_run(feed_source)
       return unless feed_source
 
-      feed_source.feed_import_runs.create!(status: :processing, started_at: Time.current)
+      feed_source.feed_import_runs.create!(user: feed_source.user, status: :processing, started_at: Time.current)
     end
 
     def fetch_feed(feed_target, run)
@@ -180,6 +180,7 @@ module Feeds
       failed_items_count = 0
       fallback_author = feed_target[:fallback_author]
 
+      # rubocop:disable Metrics/BlockLength
       feed.entries.reverse_each do |item|
         detected_items_count += 1
         if Feeds::CheckItemMediumReply.call(item)
@@ -252,6 +253,7 @@ module Feeds
       mark_feed_source_imported(feed_target[:feed_source], articles.length)
 
       articles
+      # rubocop:enable Metrics/BlockLength
     end
 
     def track_item(run, feed_target, fallback_author, item, status:, article: nil, skip_reason: nil, error_message: nil)
@@ -278,7 +280,13 @@ module Feeds
       run.feed_source.update_columns(last_error_message: error.message)
     end
 
-    def finalize_import_run(run, detected_items_count:, imported_items_count:, skipped_items_count:, failed_items_count:)
+    def finalize_import_run(
+      run,
+      detected_items_count:,
+      imported_items_count:,
+      skipped_items_count:,
+      failed_items_count:
+    )
       return unless run
 
       status = if failed_items_count.positive? && imported_items_count.zero?

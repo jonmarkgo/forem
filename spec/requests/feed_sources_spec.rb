@@ -3,7 +3,10 @@ require "rails_helper"
 RSpec.describe "FeedSources" do
   let(:user) { create(:user) }
 
-  before { sign_in user }
+  before do
+    sign_in user
+    allow(Feeds::ValidateUrl).to receive(:call).and_return(true)
+  end
 
   describe "GET /dashboard/rss-import" do
     it "renders dashboard" do
@@ -22,8 +25,8 @@ RSpec.describe "FeedSources" do
             url: "https://medium.com/feed/@vaidehijoshi",
             feed_mark_canonical: true,
             feed_referential_link: true,
-            fallback_author_id: user.id,
-          },
+            fallback_author_id: user.id
+          }
         }
       end.to change(user.feed_sources, :count).by(1)
     end
@@ -35,8 +38,8 @@ RSpec.describe "FeedSources" do
 
       patch dashboard_feed_source_path(feed_source), params: {
         feed_source: {
-          enabled: false,
-        },
+          enabled: false
+        }
       }
 
       expect(feed_source.reload.enabled).to be(false)

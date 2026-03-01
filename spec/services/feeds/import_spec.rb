@@ -25,10 +25,16 @@ RSpec.describe Feeds::Import, :vcr, type: :service do
 
       scoped_users = User.where(id: [recent_article_user.id, recent_present_user.id, stale_user.id, no_feed_user.id])
       importer = described_class.new(users_scope: scoped_users)
-      filtered = importer.send(:filter_users_from, users_scope: scoped_users, earlier_than: nil)
+      filtered = importer.__send__(
+        :filter_users_from,
+        users_scope: scoped_users,
+        earlier_than: nil,
+        feed_source_ids: nil,
+      )
 
-      expect(filtered.pluck(:id)).to contain_exactly(recent_article_user.id, recent_present_user.id)
+      expect(filtered.ids).to contain_exactly(recent_article_user.id, recent_present_user.id)
     end
+
     it "ensures that we only fetch users who can create articles", vcr: { cassette_name: "feeds_import" } do
       allow(ArticlePolicy).to receive(:scope_users_authorized_to_action).and_call_original
 
@@ -199,7 +205,7 @@ RSpec.describe Feeds::Import, :vcr, type: :service do
       # checking its invocation is a shortcut to testing the functionality.
       allow(Article).to receive(:find_by).and_call_original
 
-        user = create(:user, last_article_at: 1.month.ago, last_presence_at: 1.month.ago)
+      user = create(:user, last_article_at: 1.month.ago, last_presence_at: 1.month.ago)
       user.setting.update(feed_url: nonpermanent_link, feed_referential_link: false)
 
       described_class.call
@@ -265,23 +271,27 @@ RSpec.describe Feeds::Import, :vcr, type: :service do
     let(:user) { create(:user, last_article_at: 1.month.ago, last_presence_at: 1.month.ago) }
     let(:feed_source) { create(:feed_source, user: user, fallback_author: user, url: "https://example.com/rss.xml") }
     let(:item) do
-      instance_double(
-        Feedjira::Parser::RSSEntry,
-        title: "A sample title",
-        url: "https://example.com/post-1",
-        categories: ["ruby"],
-        content: "<p>Hello world</p>",
-        summary: nil,
-        description: nil,
-        published: Time.current,
-        entry_id: "post-1",
-        :[] => nil,
+      Struct.new(:title, :url, :categories, :content, :summary, :description, :published, :entry_id) do
+        def [](key)
+          return if key == :categories
+
+          nil
+        end
+      end.new(
+        "A sample title",
+        "https://example.com/post-1",
+        ["ruby"],
+        "<p>Hello world</p>",
+        nil,
+        nil,
+        Time.current,
+        "post-1",
       )
     end
     let(:feed) { instance_double(Feedjira::Parser::RSS, entries: [item]) }
 
     before do
-      allow(HTTParty).to receive(:get).and_return(double(body: "<xml />"))
+      allow(HTTParty).to receive(:get).and_return(instance_double(HTTParty::Response, body: "<xml />"))
       allow(Feedjira).to receive(:parse).and_return(feed)
       allow(Feeds::CheckItemMediumReply).to receive(:call).and_return(false)
       allow(Feeds::CheckItemPreviouslyImported).to receive(:call).and_return(false)

@@ -1,6 +1,10 @@
 require "rails_helper"
 
-RSpec.describe FeedSource, type: :model do
+RSpec.describe FeedSource do
+  before do
+    allow(Feeds::ValidateUrl).to receive(:call).and_return(true)
+  end
+
   describe "validations" do
     subject(:feed_source) { build(:feed_source) }
 

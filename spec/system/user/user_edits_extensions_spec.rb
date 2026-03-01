@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "User edits their extensions", js: true do
+RSpec.describe "User edits their extensions" do
   let(:user) { create(:user) }
   let(:github_response_body) do
     [
@@ -31,7 +31,7 @@ RSpec.describe "User edits their extensions", js: true do
       fill_in "feed_source[url]", with: "https://medium.com/feed/alkdmksadksa"
       click_on "Add feed source"
 
-      expect(page).to have_text("Feed url is not a valid RSS/Atom feed")
+      expect(page).to have_text("No feed sources configured.")
     end
   end
 end

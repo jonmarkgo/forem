@@ -5,7 +5,7 @@ class FeedSourcesController < ApplicationController
   after_action :verify_authorized
 
   def create
-    authorize current_user, policy_class: UserPolicy
+    authorize current_user, :update?, policy_class: UserPolicy
     feed_source = current_user.feed_sources.new(feed_source_params)
 
     if feed_source.save
@@ -18,7 +18,7 @@ class FeedSourcesController < ApplicationController
   end
 
   def update
-    authorize current_user, policy_class: UserPolicy
+    authorize current_user, :update?, policy_class: UserPolicy
 
     if @feed_source.update(feed_source_params)
       flash[:settings_notice] = I18n.t("users_controller.updated_config")
@@ -30,7 +30,7 @@ class FeedSourcesController < ApplicationController
   end
 
   def destroy
-    authorize current_user, policy_class: UserPolicy
+    authorize current_user, :update?, policy_class: UserPolicy
     @feed_source.destroy
 
     flash[:settings_notice] = I18n.t("users_controller.updated_config")
@@ -38,7 +38,7 @@ class FeedSourcesController < ApplicationController
   end
 
   def fetch
-    authorize current_user, policy_class: UserPolicy
+    authorize current_user, :update?, policy_class: UserPolicy
     Feeds::ImportArticlesWorker.perform_async([], nil, [@feed_source.id])
     flash[:settings_notice] = I18n.t("users_controller.updated_config")
 

@@ -15,9 +15,9 @@ class CreateFeedSourcesAndImportTracking < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_foreign_key :feed_sources, :users
-    add_foreign_key :feed_sources, :users, column: :fallback_author_id
-    add_foreign_key :feed_sources, :organizations, column: :fallback_organization_id
+    add_foreign_key :feed_sources, :users, validate: false
+    add_foreign_key :feed_sources, :users, column: :fallback_author_id, validate: false
+    add_foreign_key :feed_sources, :organizations, column: :fallback_organization_id, validate: false
 
     create_table :feed_import_runs do |t|
       t.bigint :user_id, null: false
@@ -34,8 +34,8 @@ class CreateFeedSourcesAndImportTracking < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_foreign_key :feed_import_runs, :users
-    add_foreign_key :feed_import_runs, :feed_sources
+    add_foreign_key :feed_import_runs, :users, validate: false
+    add_foreign_key :feed_import_runs, :feed_sources, validate: false
 
     create_table :feed_import_items do |t|
       t.bigint :user_id, null: false
@@ -53,9 +53,9 @@ class CreateFeedSourcesAndImportTracking < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_foreign_key :feed_import_items, :users
-    add_foreign_key :feed_import_items, :feed_sources
-    add_foreign_key :feed_import_items, :feed_import_runs
-    add_foreign_key :feed_import_items, :articles
+    add_foreign_key :feed_import_items, :users, validate: false
+    add_foreign_key :feed_import_items, :feed_sources, validate: false
+    add_foreign_key :feed_import_items, :feed_import_runs, validate: false
+    add_foreign_key :feed_import_items, :articles, validate: false
   end
 end
